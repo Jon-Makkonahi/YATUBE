@@ -20,8 +20,9 @@ PROFILE_URL = reverse('posts:profile', args=[USERNAME])
 
 HOME_URL2 = '/'
 GROUP_URL2 = f'/group/{SLUG}/'
-PROFILE_URL2  = f'/profile/{USERNAME}/'
+PROFILE_URL2 = f'/profile/{USERNAME}/'
 CREATE_URL2 = '/create/'
+
 
 @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
 class PostsROUTERSTests(TestCase):
@@ -41,7 +42,7 @@ class PostsROUTERSTests(TestCase):
         )
         cls.POST_URL = reverse('posts:post_detail', args=[cls.post.pk])
         cls.EDIT_URL = reverse('posts:post_edit', args=[cls.post.pk])
-        cls.POST_URL2 = f'/posts/{ cls.post.pk }/' 
+        cls.POST_URL2 = f'/posts/{ cls.post.pk }/'
         cls.EDIT_URL2 = f'/posts/{ cls.post.pk }/edit/'
 
     @classmethod

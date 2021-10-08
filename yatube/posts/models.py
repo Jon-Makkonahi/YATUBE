@@ -32,7 +32,7 @@ class Post(models.Model):
         'Картинка',
         upload_to='posts/',
         blank=True
-    )  
+    )
 
     class Meta:
         ordering = ('-pub_date',)
@@ -50,7 +50,7 @@ class Comment(models.Model):
         related_name='comments'
     )
     post = models.ForeignKey(
-        Post, 
+        Post,
         on_delete=models.SET_NULL,
         related_name='comments',
         blank=True,

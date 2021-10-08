@@ -48,7 +48,10 @@ class PostsURLTests(TestCase):
         )
         cls.POST_URL = reverse('posts:post_detail', args=[cls.post.pk])
         cls.EDIT_URL = reverse('posts:post_edit', args=[cls.post.pk])
-        cls.COMMENT_URL = reverse('posts:add_comment', args=[cls.comment.post.pk])
+        cls.COMMENT_URL = reverse(
+            'posts:add_comment',
+            args=[cls.comment.post.pk]
+        )
         cls.REDIRECT_EDIT_URL = (LOGIN_URL + '?next=' + cls.EDIT_URL)
         cls.REDIRECT_ADD_URL = (LOGIN_URL + '?next=' + cls.COMMENT_URL)
 
@@ -91,7 +94,11 @@ class PostsURLTests(TestCase):
             [self.POST_URL, self.guest_client, 'posts/post_detail.html'],
             [self.EDIT_URL, self.authorized_client2, 'posts/create_post.html'],
             [CREATE_URL, self.authorized_client, 'posts/create_post.html'],
-            [self.COMMENT_URL, self.authorized_client, 'posts/post_detail.html'],
+            [
+                self.COMMENT_URL,
+                self.authorized_client,
+                'posts/post_detail.html'
+            ],
             [UNEXISTING_PAGE_URL, self.guest_client, 'core/404.html']
         ]
         for url, client, template in cases:
