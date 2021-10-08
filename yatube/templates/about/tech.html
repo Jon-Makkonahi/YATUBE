@@ -1,0 +1,49 @@
+<!-- templates/about/tech.html -->
+{% extends "base.html" %}
+{% block title %}Технологии{% endblock %}
+{% block content %}
+{% comment %} Колонки с отступом сверху и снизу {% endcomment %}
+<div class="container py-5">
+  <div class="row">
+  <h1>Вот что я умею</h1>
+    {% comment %}
+        Боковой блок со списком технологий 
+        Займет всю ширину блока на мобильном
+        и 25% при размерах экрана ≥768px
+    {% endcomment %}
+  <aside class="col-12 col-md-3">
+      <ul class="list-group list-group-flush">
+      <li class="list-group-item">
+          Python
+          <article class="col-12 col-md-9">
+          <p>
+          Я знаю:
+          <ul>
+            <li>Базовые навыки в Python</li>
+            <li>ООП Python</li>
+          </ul>
+         </p>
+  </article>
+      </li>
+      <li class="list-group-item">
+          Django
+           <p>
+          Я понимаю:
+          <ul>
+            <li>urls и wiews in Django</li>
+            <li>Django ORM</li>
+            <li>HTML</li>
+          </ul>
+         </p>
+      </li>
+      </ul>
+      <a href = "{% url 'about:author' %}">Вернуться назад</a>
+  </aside>
+    {% comment %}
+        Статья  
+        Займет всю ширину блока на мобильном
+        и 75% при размерах экрана ≥768px
+    {% endcomment %}
+  </div>
+</div>
+{% endblock %}
