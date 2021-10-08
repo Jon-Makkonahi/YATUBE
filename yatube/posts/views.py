@@ -122,4 +122,3 @@ def profile_unfollow(request, username):
     if Follow.objects.filter(pk=profile_follow.pk).exists():
         profile_follow.delete()
     return redirect('posts:profile', username=username)
-    
