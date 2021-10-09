@@ -60,7 +60,7 @@ class Comment(models.Model):
         on_delete=models.CASCADE,
         related_name='comments',
     )
-    
+
     class Meta:
         ordering = ('-created',)
         verbose_name = 'Комментарий'

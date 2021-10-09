@@ -22,6 +22,7 @@ CREATE_URL2 = '/create/'
 FOLLOW_URL2 = '/follow/'
 REDIRECT_CREATE_URL2 = '/auth/login/?next=/create/'
 
+
 class PostsRoutersTests(TestCase):
     @classmethod
     def setUpClass(cls):

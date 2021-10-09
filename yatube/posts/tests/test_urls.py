@@ -25,6 +25,7 @@ LOGIN_URL = reverse('users:login')
 REDIRECT_CREATE_URL = (LOGIN_URL + '?next=' + CREATE_URL)
 REDIRECT_FOLLOW_URL = (LOGIN_URL + '?next=' + FOLLOW_URL)
 
+
 @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
 class PostsURLTests(TestCase):
     @classmethod
@@ -47,12 +48,11 @@ class PostsURLTests(TestCase):
         cls.authorized_client.force_login(cls.user_one)
         cls.authorized_client2 = Client()
         cls.authorized_client2.force_login(cls.user_two)
-        
+
         cls.POST_URL = reverse('posts:post_detail', args=[cls.post.pk])
         cls.EDIT_URL = reverse('posts:post_edit', args=[cls.post.pk])
         cls.REDIRECT_EDIT_URL = (LOGIN_URL + '?next=' + cls.EDIT_URL)
 
-        
     @classmethod
     def tearDownClass(cls):
         super().tearDownClass()

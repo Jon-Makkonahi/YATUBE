@@ -85,7 +85,7 @@ class PostFormTests(TestCase):
         cls.REDIRECT_EDIT_URL = (LOGIN_URL + '?next=' + cls.EDIT_URL)
         cls.COMMENT_URL = reverse('posts:add_comment', args=[cls.post.pk])
         cls.REDIRECT_COMMENT_URL = (LOGIN_URL + '?next=' + cls.COMMENT_URL)
-        
+
     @classmethod
     def tearDownClass(cls):
         super().tearDownClass()
@@ -201,7 +201,6 @@ class PostFormTests(TestCase):
         }
         comments = Comment.objects.first()
         self.assertEqual(comments.text, form_data['text'])
-    
 
     def test_anonimys_create_comment(self):
         form_data = {
