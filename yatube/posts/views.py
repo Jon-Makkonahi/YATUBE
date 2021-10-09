@@ -7,7 +7,7 @@ from .forms import PostForm, CommentForm
 from .models import Group, Post, User, Follow
 
 
-def returns_the_paginator_page(request, post_list):
+def paginator_page(request, post_list):
     paginator = Paginator(post_list, settings.POSTS_QUANTITY)
     page_number = request.GET.get('page')
     return paginator.get_page(page_number)
@@ -15,7 +15,7 @@ def returns_the_paginator_page(request, post_list):
 
 def index(request):
     return render(request, 'posts/index.html', {
-        'page_obj': returns_the_paginator_page(request, Post.objects.all())
+        'page_obj': paginator_page(request, Post.objects.all())
     })
 
 
@@ -23,17 +23,20 @@ def group_posts(request, slug):
     group = get_object_or_404(Group, slug=slug)
     return render(request, 'posts/group_list.html', {
         'group': group,
-        'page_obj': returns_the_paginator_page(request, group.posts.all())
+        'page_obj': paginator_page(request, group.posts.all())
     })
 
 
 def profile(request, username):
     author = get_object_or_404(User, username=username)
     user = request.user
-    following = user.is_authenticated and author.following.exists()
+    following = Follow.objects.filter(
+        user__username=user,
+        author=author
+    )
     return render(request, 'posts/profile.html', {
         'author': author,
-        'page_obj': returns_the_paginator_page(request, author.posts.all()),
+        'page_obj': paginator_page(request, author.posts.all()),
         'following': following
     })
 
@@ -52,16 +55,12 @@ def post_detail(request, post_id):
 def add_comment(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     form = CommentForm(request.POST or None)
-    if not form.is_valid():
-        return render(request, 'posts/post_detail.html', {
-            'form': form,
-            'post': post,
-        })
-    comment = form.save(commit=False)
-    comment.author = request.user
-    comment.post = post
-    comment.save()
-    return redirect('posts:post_detail', post_id=post_id)
+    if form.is_valid():
+        comment = form.save(commit=False)
+        comment.author = request.user
+        comment.post = post
+        comment.save()
+    return redirect('posts:post_detail', post_id=post_id) 
 
 
 @login_required
@@ -96,13 +95,11 @@ def post_edit(request, post_id):
 
 @login_required
 def follow_index(request):
-    user = request.user
-    authors = user.follower.values_list('author', flat=True)
-    posts_list = Post.objects.filter(author__id__in=authors)
+    posts_list = Post.objects.filter(author__following__user=request.user)
     return render(
         request,
         "posts/follow.html",
-        {'page_obj': returns_the_paginator_page(request, posts_list)}
+        {'page_obj': paginator_page(request, posts_list)}
     )
 
 
@@ -116,9 +113,8 @@ def profile_follow(request, username):
 
 @login_required
 def profile_unfollow(request, username):
-    author = get_object_or_404(User, username=username)
-    profile_follow = Follow.objects.get(author=author,
-                                        user=request.user)
-    if Follow.objects.filter(pk=profile_follow.pk).exists():
-        profile_follow.delete()
+    Follow.objects.get(
+        user=request.user,
+        author__username=username
+    ).delete()
     return redirect('posts:profile', username=username)

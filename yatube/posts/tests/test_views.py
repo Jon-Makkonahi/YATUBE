@@ -25,7 +25,16 @@ GROUP_URL2 = reverse('posts:group_list', args=[SLUG2])
 GROUP_URL3 = reverse('posts:group_list', args=[SLUG3])
 PROFILE_URL = reverse('posts:profile', args=[USERNAME])
 PROFILE_URL2 = reverse('posts:profile', args=[USERNAME2])
+FOLLOW_URL = reverse('posts:follow_index')
 
+SMALL_GIF = (
+    b'\x47\x49\x46\x38\x39\x61\x02\x00'
+    b'\x01\x00\x80\x00\x00\x00\x00\x00'
+    b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
+    b'\x00\x00\x00\x2C\x00\x00\x00\x00'
+    b'\x02\x00\x01\x00\x00\x02\x02\x0C'
+    b'\x0A\x00\x3B'
+)
 
 @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
 class PostsPagesTests(TestCase):
@@ -49,17 +58,9 @@ class PostsPagesTests(TestCase):
         )
         cls.user = User.objects.create_user(username=USERNAME)
         cls.user2 = User.objects.create_user(username=USERNAME2)
-        cls.small_gif = (
-            b'\x47\x49\x46\x38\x39\x61\x02\x00'
-            b'\x01\x00\x80\x00\x00\x00\x00\x00'
-            b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
-            b'\x00\x00\x00\x2C\x00\x00\x00\x00'
-            b'\x02\x00\x01\x00\x00\x02\x02\x0C'
-            b'\x0A\x00\x3B'
-        )
         cls.uploaded = SimpleUploadedFile(
             name='small.gif',
-            content=cls.small_gif,
+            content=SMALL_GIF,
             content_type='image/gif'
         )
         cls.post = Post.objects.create(
@@ -68,11 +69,8 @@ class PostsPagesTests(TestCase):
             text='text',
             image=cls.uploaded
         )
-        cls.comment = Comment.objects.create(
-            author=cls.user,
-            post=cls.post,
-            text='comments'
-        )
+        cls.authorized_client = Client()
+        cls.authorized_client.force_login(cls.user)
         cls.POST_URL = reverse('posts:post_detail', args=[cls.post.pk])
         cls.EDIT_URL = reverse('posts:post_edit', args=[cls.post.pk])
 
@@ -80,10 +78,6 @@ class PostsPagesTests(TestCase):
     def tearDownClass(cls):
         super().tearDownClass()
         shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)
-
-    def setUp(self):
-        self.authorized_client = Client()
-        self.authorized_client.force_login(self.user)
 
     def test_main_context(self):
         addresses = [
@@ -133,10 +127,6 @@ class PostsPagesTests(TestCase):
         response = self.authorized_client.get(PROFILE_URL)
         self.assertEqual(response.context['author'], self.user)
 
-    def test_fixtures_profile(self):
-        response = self.authorized_client.get(PROFILE_URL)
-        self.assertEqual(response.context['author'], self.user)
-
     def test_fixtures_group(self):
         response = self.authorized_client.get(GROUP_URL)
         group = response.context['group']
@@ -144,20 +134,13 @@ class PostsPagesTests(TestCase):
         self.assertEqual(group.title, self.group.title)
         self.assertEqual(group.description, self.group.description)
 
-    def test_add_comment(self):
-        response = self.authorized_client.get(self.POST_URL)
-        post = response.context['comments'][0]
-        self.assertEqual(post, self.comment)
-
     def test_cache(self):
-        posts_count = Post.objects.count()
-        response = self.authorized_client.get(HOME_URL).content
+        page = self.authorized_client.get(HOME_URL).content
+        self.assertEqual(
+            page, self.authorized_client.get(HOME_URL).content)
         Post.objects.create(
             text='text', author=self.user, group=self.group
         )
-        self.assertEqual(Post.objects.count(), posts_count + 1)
-        self.assertEqual(
-            response, self.authorized_client.get(HOME_URL).content)
         cache.clear()
         self.assertNotEqual(
-            response, self.authorized_client.get(HOME_URL).content)
+            page, self.authorized_client.get(HOME_URL).content)
