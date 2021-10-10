@@ -143,7 +143,7 @@ class PostsViewsTests(TestCase):
         self.assertTrue(
             Follow.objects.filter(user=self.user, author=self.user2).exists()
         )
-    
+
     def test_unfollow(self):
         follow_count = Follow.objects.count()
         self.assertTrue(

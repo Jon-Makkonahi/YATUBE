@@ -18,11 +18,10 @@ UNFOLLOW_URL = reverse('posts:profile_unfollow', args=[USERNAME])
 HOME_URL2 = '/'
 GROUP_URL2 = f'/group/{SLUG}/'
 PROFILE_URL2 = f'/profile/{USERNAME}/'
-FOLLOW_URL2=f'/profile/{USERNAME}/follow/'
-UNFOLLOW_URL2=f'/profile/{USERNAME}/unfollow/'
+FOLLOW_URL2 = f'/profile/{USERNAME}/follow/'
+UNFOLLOW_URL2 = f'/profile/{USERNAME}/unfollow/'
 CREATE_URL2 = '/create/'
 FOLLOW_INDEX_URL2 = '/follow/'
-
 
 
 class PostsRoutersTests(TestCase):
@@ -48,9 +47,9 @@ class PostsRoutersTests(TestCase):
             [EDIT_URL, EDIT_URL2],
             [CREATE_URL, CREATE_URL2],
             [FOLLOW_INDEX_URL, FOLLOW_INDEX_URL2],
-            [FOLLOW_URL, FOLLOW_URL2],  
-            [UNFOLLOW_URL, UNFOLLOW_URL2],       
-        ]   
+            [FOLLOW_URL, FOLLOW_URL2],
+            [UNFOLLOW_URL, UNFOLLOW_URL2],
+        ]
         for urlname, url in cases:
             with self.subTest(urlname=urlname):
                 self.assertEqual(urlname, url)

@@ -1,11 +1,15 @@
 {% extends 'base.html' %}
-{% load thumbnail %}
 {% block title %}
   Пост {{ post.text|truncatechars:30 }}
 {% endblock  %}    
 {% block content %}
   <div class="container py-5">
     <div class="row">
+      <ul>
+        <li>
+          Всего постов автора:{{ post.author.posts.count }}
+        </li>
+      </ul>
       {% include 'posts/includes/card_post.html' %}
       {% if post.author == request.user %}
         <a class="btn btn-primary" href="{% url 'posts:post_edit' post.pk %}"> 
