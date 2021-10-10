@@ -31,9 +31,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'sorl.thumbnail',
-    'posts.apps.PostsConfig',
-    'users.apps.UsersConfig',
     'core.apps.CoreConfig',
+    'users.apps.UsersConfig',
+    'posts.apps.PostsConfig',
 ]
 
 MIDDLEWARE = [
@@ -129,5 +129,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
 
 POSTS_QUANTITY = 10
+
+UPLOAD_POST = 'posts'
 
 CSRF_FAILURE_VIEW = 'core.views.csrf_failure'

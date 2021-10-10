@@ -6,7 +6,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
-from ..models import Post, Group, User, Comment
+from ..models import Post, Group, User
 
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
@@ -69,11 +69,6 @@ class PostFormTests(TestCase):
             group=cls.group3,
             text=TEXT2
         )
-        cls.comment = Comment.objects.create(
-            author=cls.user,
-            post=cls.post,
-            text=COMMENT
-        )
         cls.guest_client = Client()
         cls.authorized_client = Client()
         cls.authorized_client.force_login(cls.user)
@@ -111,11 +106,14 @@ class PostFormTests(TestCase):
         )
         self.assertRedirects(response, PROFILE_URL)
         self.assertEqual(Post.objects.count(), posts_count + 1)
-        post = response.context['post']
+        post = response.context['page_obj'][0]
         self.assertEqual(post.text, form_data['text'])
         self.assertEqual(post.author, self.user)
         self.assertEqual(post.group.id, form_data['group'])
-        self.assertEqual(post.image.name, f'posts/{ uploaded.name }')
+        self.assertEqual(
+            post.image.name,
+            f'{ settings.UPLOAD_POST }/{ uploaded.name }'
+        )
 
     def test_post_edit(self):
         uploaded = SimpleUploadedFile(
@@ -138,11 +136,14 @@ class PostFormTests(TestCase):
         self.assertEqual(post.text, form_data['text'])
         self.assertEqual(post.author, self.post.author)
         self.assertEqual(post.group.id, form_data['group'])
-        self.assertEqual(post.image.name, f'posts/{ uploaded.name }')
+        self.assertEqual(
+            post.image.name,
+            f'{ settings.UPLOAD_POST }/{ uploaded.name }'
+        )
 
     def test_anonimys_post_edit(self):
         uploaded = SimpleUploadedFile(
-            name='small2.gif',
+            name='small3.gif',
             content=SMALL_GIF,
             content_type='image/gif'
         )
@@ -157,9 +158,14 @@ class PostFormTests(TestCase):
             follow=True
         )
         self.assertRedirects(response, self.REDIRECT_EDIT_URL)
+        self.assertEqual(self.post.text, self.post.text)
+        self.assertEqual(self.post.author, self.post.author)
+        self.assertEqual(self.post.group.pk, self.post.group.pk)
+        self.assertEqual(self.post.image, self.post.image)
 
     def test_anonimys_create_post(self):
         Post.objects.all().delete()
+        posts_count = Post.objects.count()
         uploaded = SimpleUploadedFile(
             name='small.gif',
             content=SMALL_GIF,
@@ -176,6 +182,7 @@ class PostFormTests(TestCase):
             follow=True
         )
         self.assertRedirects(response, REDIRECT_CREATE_URL)
+        self.assertEqual(Post.objects.count(), posts_count)
 
     def test_non_author_post_edit(self):
         uploaded = SimpleUploadedFile(
@@ -194,13 +201,22 @@ class PostFormTests(TestCase):
             follow=True
         )
         self.assertRedirects(response, HOME_URL)
+        self.assertEqual(self.post.text, self.post.text)
+        self.assertEqual(self.post.author, self.post.author)
+        self.assertEqual(self.post.group.pk, self.post.group.pk)
+        self.assertEqual(self.post.image, self.post.image)
 
     def test_create_comment(self):
         form_data = {
             'text': COMMENT
         }
-        comments = Comment.objects.first()
-        self.assertEqual(comments.text, form_data['text'])
+        response = self.authorized_client.post(
+            self.COMMENT_URL,
+            date=form_data,
+            follow=True
+        )
+        comments = response.context['comments']
+        self.assertIsNotNone(comments)
 
     def test_anonimys_create_comment(self):
         form_data = {

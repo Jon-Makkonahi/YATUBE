@@ -10,7 +10,6 @@
     <p>{{ group.description|linebreaksbr }}</p><hr>
     {% for post in page_obj %}
       {% include 'posts/includes/card_post.html' %}
-      <a href="{% url 'posts:post_detail' post.id %}">Подробная информация</a><br>
       {% if not forloop.last %}<hr>{% endif %}
     {% endfor %}
     {% include 'posts/includes/paginator.html' %}

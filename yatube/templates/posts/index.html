@@ -5,19 +5,15 @@
   <div class="container py-5">
     <h1>Последние обновления на сайте</h1>
     {% if user.is_authenticated %}
-      {% include 'posts/includes/switcher.html' %}
+      {% include 'posts/includes/switcher.html' with index=True %}
     {% endif %}
     {% load cache %}
     {% cache 20 index_page %}
-    {% for post in page_obj %}
-      {% include 'posts/includes/card_post.html' %}
-      <a href="{% url 'posts:post_detail' post.id %}">Подробная информация</a><br>
-      {% if post.group %}
-        <p>Группа: <a href="{% url 'posts:group_list' post.group.slug %}">{{ post.group }}</a></p>
-      {% endif %}
-      {% if not forloop.last %}<hr>{% endif %}
-    {% endfor %}
-    {% include 'posts/includes/paginator.html' %}
+      {% for post in page_obj %}
+        {% include 'posts/includes/card_post.html' %}
+        {% if not forloop.last %}<hr>{% endif %}
+      {% endfor %}
+      {% include 'posts/includes/paginator.html' %}
     {% endcache %}
   </div>
 {% endblock %}

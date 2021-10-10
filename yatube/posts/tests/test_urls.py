@@ -5,7 +5,7 @@ from django.conf import settings
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
-from ..models import Group, Post, User
+from ..models import Group, Post, User, Follow
 
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
@@ -19,11 +19,17 @@ HOME_URL = reverse('posts:index')
 CREATE_URL = reverse('posts:post_create')
 GROUP_URL = reverse('posts:group_list', args=[SLUG])
 PROFILE_URL = reverse('posts:profile', args=[USERNAME])
-FOLLOW_URL = reverse('posts:follow_index')
-UNEXISTING_PAGE_URL = 'pythondeveloper/best/'
+PROFILE_URL2 = reverse('posts:profile', args=[USERNAME2])
+FOLLOW_INDEX_URL = reverse('posts:follow_index')
+FOLLOW_URL = reverse('posts:profile_follow', args=[USERNAME2])
+UNFOLLOW_URL = reverse('posts:profile_unfollow', args=[USERNAME2])
 LOGIN_URL = reverse('users:login')
+UNEXISTING_PAGE_URL = 'pythondeveloper/best/'
+
 REDIRECT_CREATE_URL = (LOGIN_URL + '?next=' + CREATE_URL)
+REDIRECT_INDEX_FOLLOW_URL = (LOGIN_URL + '?next=' + FOLLOW_INDEX_URL)
 REDIRECT_FOLLOW_URL = (LOGIN_URL + '?next=' + FOLLOW_URL)
+REDIRECT_UNFOLLOW_URL = (LOGIN_URL + '?next=' + UNFOLLOW_URL)
 
 
 @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
@@ -48,7 +54,6 @@ class PostsURLTests(TestCase):
         cls.authorized_client.force_login(cls.user_one)
         cls.authorized_client2 = Client()
         cls.authorized_client2.force_login(cls.user_two)
-
         cls.POST_URL = reverse('posts:post_detail', args=[cls.post.pk])
         cls.EDIT_URL = reverse('posts:post_edit', args=[cls.post.pk])
         cls.REDIRECT_EDIT_URL = (LOGIN_URL + '?next=' + cls.EDIT_URL)
@@ -59,6 +64,10 @@ class PostsURLTests(TestCase):
         shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)
 
     def test_url_pages(self):
+        Follow.objects.create(
+            author=self.user_two,
+            user=self.user_one
+        )
         cases = [
             [HOME_URL, self.guest_client, 200],
             [GROUP_URL, self.guest_client, 200],
@@ -70,8 +79,12 @@ class PostsURLTests(TestCase):
             [CREATE_URL, self.guest_client, 302],
             [self.EDIT_URL, self.authorized_client, 302],
             [self.EDIT_URL, self.guest_client, 302],
-            [FOLLOW_URL, self.authorized_client, 200],
+            [FOLLOW_INDEX_URL, self.authorized_client, 200],
+            [FOLLOW_INDEX_URL, self.guest_client, 302],
+            [FOLLOW_URL, self.authorized_client, 302],
             [FOLLOW_URL, self.guest_client, 302],
+            [UNFOLLOW_URL, self.authorized_client, 302],
+            [UNFOLLOW_URL, self.guest_client, 302],
         ]
         for url, client, code in cases:
             with self.subTest(url=url, client=client, code=code):
@@ -86,7 +99,7 @@ class PostsURLTests(TestCase):
             [self.EDIT_URL, self.authorized_client2, 'posts/create_post.html'],
             [CREATE_URL, self.authorized_client, 'posts/create_post.html'],
             [UNEXISTING_PAGE_URL, self.guest_client, 'core/404.html'],
-            [FOLLOW_URL, self.authorized_client, 'posts/follow.html']
+            [FOLLOW_INDEX_URL, self.authorized_client, 'posts/follow.html']
         ]
         for url, client, template in cases:
             with self.subTest(url=url):
@@ -94,11 +107,15 @@ class PostsURLTests(TestCase):
 
     def test_redirect_pages(self):
         cases = [
-            [CREATE_URL, True, self.guest_client, REDIRECT_CREATE_URL],
-            [self.EDIT_URL, True, self.authorized_client, HOME_URL],
-            [self.EDIT_URL, True, self.guest_client, self.REDIRECT_EDIT_URL],
-            [FOLLOW_URL, True, self.guest_client, REDIRECT_FOLLOW_URL],
+            [CREATE_URL, self.guest_client, REDIRECT_CREATE_URL],
+            [self.EDIT_URL, self.authorized_client, HOME_URL],
+            [self.EDIT_URL, self.guest_client, self.REDIRECT_EDIT_URL],
+            [FOLLOW_URL, self.authorized_client, PROFILE_URL2],
+            [UNFOLLOW_URL, self.authorized_client, PROFILE_URL2],
+            [FOLLOW_URL, self.guest_client, REDIRECT_FOLLOW_URL],
+            [UNFOLLOW_URL, self.guest_client, REDIRECT_UNFOLLOW_URL],
+            [FOLLOW_INDEX_URL, self.guest_client, REDIRECT_INDEX_FOLLOW_URL],
         ]
-        for url, follow, client, redirect in cases:
+        for url, client, redirect in cases:
             with self.subTest(url=url, client=client, redirect=redirect):
-                self.assertRedirects(client.get(url, follow=follow), redirect)
+                self.assertRedirects(client.get(url, follow=True), redirect)
