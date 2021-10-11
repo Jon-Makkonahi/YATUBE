@@ -36,6 +36,7 @@ SMALL_GIF = (
     b'\x0A\x00\x3B'
 )
 
+
 @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
 class PostFormTests(TestCase):
     @classmethod
@@ -73,7 +74,6 @@ class PostFormTests(TestCase):
         cls.COMMENT_URL = reverse('posts:add_comment', args=[cls.post.pk])
         cls.REDIRECT_EDIT_URL = (LOGIN_URL + '?next=' + cls.EDIT_URL)
         cls.REDIRECT_COMMENT_URL = (LOGIN_URL + '?next=' + cls.COMMENT_URL)
-
 
     @classmethod
     def tearDownClass(cls):
@@ -172,7 +172,7 @@ class PostFormTests(TestCase):
         self.assertEqual(comment.text, form_data['text'])
         self.assertEqual(comment.author, self.user)
         self.assertEqual(comment.post, self.post)
-        
+
     def test_anonimys_create_comment(self):
         self.post.comments.all().delete()
         form_data = {
