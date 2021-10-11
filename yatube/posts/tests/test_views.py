@@ -151,6 +151,9 @@ class PostsViewsTests(TestCase):
         )
         self.authorized_client.get(UNFOLLOW_URL)
         self.assertEqual(Follow.objects.count(), follow_count - 1)
+        self.assertFalse(
+            Follow.objects.filter(user=self.user, author=self.user2).exists()
+        )
 
     def test_cache(self):
         page = self.authorized_client.get(HOME_URL).content

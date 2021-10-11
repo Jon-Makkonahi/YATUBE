@@ -1,4 +1,3 @@
-
 {% load thumbnail %}
 <ul>
   <li>
@@ -12,7 +11,11 @@
   <img class="card-img my-2" src="{{ im.url }}">
 {% endthumbnail %}
 <p>{{ post.text|linebreaksbr }}</p>
-<a href="{% url 'posts:post_detail' post.id %}">Подробная информация</a><br>
+{% if post_detail %}
+  <a href="{% url 'posts:post_detail' post.id %}">Подробная информация</a><br>
+{% endif %}
 {% if post.group %}
-  <p>Группа: <a href="{% url 'posts:group_list' post.group.slug %}">{{ post.group }}</a></p>
+  {% if post_group %}
+    <p>Группа: <a href="{% url 'posts:group_list' post.group.slug %}">{{ post.group }}</a></p>
+  {% endif %}
 {% endif %}

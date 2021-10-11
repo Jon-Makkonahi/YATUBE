@@ -27,7 +27,7 @@
     <article>
     <br>
       {% for post in page_obj %}
-        {% include 'posts/includes/card_post.html' %}
+        {% include 'posts/includes/post_card.html' with post_group=True post_detail=True %}
       {% endfor %}
     </article>    
     {% include 'posts/includes/paginator.html' %}
