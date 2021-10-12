@@ -28,7 +28,7 @@ class PostsRoutersTests(TestCase):
             ['post_create', [], '/create/'],
             ['follow_index', [], '/follow/'],
             ['profile_follow', [USERNAME], f'/profile/{USERNAME}/follow/'],
-            ['profile_unfollow', [USERNAME],  f'/profile/{USERNAME}/unfollow/']
+            ['profile_unfollow', [USERNAME], f'/profile/{USERNAME}/unfollow/']
         ]
         for url1, args, url2 in cases:
             with self.subTest(url=url1, args=args):
