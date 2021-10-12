@@ -27,7 +27,8 @@
     <article>
     <br>
       {% for post in page_obj %}
-        {% include 'posts/includes/post_card.html' with post_group=True post_detail=True %}
+        {% include 'posts/includes/post_card.html' %}
+        {% if not forloop.last %}<hr>{% endif %}
       {% endfor %}
     </article>    
     {% include 'posts/includes/paginator.html' %}

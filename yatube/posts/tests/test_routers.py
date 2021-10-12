@@ -19,35 +19,17 @@ class PostsRoutersTests(TestCase):
         )
 
     def test_routers_pages(self):
-        HOME_URL = reverse('posts:index')
-        CREATE_URL = reverse('posts:post_create')
-        GROUP_URL = reverse('posts:group_list', args=[SLUG])
-        PROFILE_URL = reverse('posts:profile', args=[USERNAME])
-        FOLLOW_INDEX_URL = reverse('posts:follow_index')
-        FOLLOW_URL = reverse('posts:profile_follow', args=[USERNAME])
-        UNFOLLOW_URL = reverse('posts:profile_unfollow', args=[USERNAME])
-        POST_URL = reverse('posts:post_detail', args=[self.post.pk])
-        EDIT_URL = reverse('posts:post_edit', args=[self.post.pk])
-        HOME_URL2 = '/'
-        GROUP_URL2 = f'/group/{SLUG}/'
-        PROFILE_URL2 = f'/profile/{USERNAME}/'
-        FOLLOW_URL2 = f'/profile/{USERNAME}/follow/'
-        UNFOLLOW_URL2 = f'/profile/{USERNAME}/unfollow/'
-        CREATE_URL2 = '/create/'
-        FOLLOW_INDEX_URL2 = '/follow/'
-        POST_URL2 = f'/posts/{ self.post.pk }/'
-        EDIT_URL2 = f'/posts/{ self.post.pk }/edit/'
         cases = [
-            [HOME_URL, HOME_URL2],
-            [GROUP_URL, GROUP_URL2],
-            [PROFILE_URL, PROFILE_URL2],
-            [POST_URL, POST_URL2],
-            [EDIT_URL, EDIT_URL2],
-            [CREATE_URL, CREATE_URL2],
-            [FOLLOW_INDEX_URL, FOLLOW_INDEX_URL2],
-            [FOLLOW_URL, FOLLOW_URL2],
-            [UNFOLLOW_URL, UNFOLLOW_URL2],
+            ['index', [], '/'],
+            ['group_list',[SLUG], f'/group/{SLUG}/'],
+            ['profile',[USERNAME], f'/profile/{USERNAME}/'],
+            ['post_detail', [self.post.pk], f'/posts/{ self.post.pk }/'],
+            ['post_edit', [self.post.pk], f'/posts/{ self.post.pk }/edit/'],
+            ['post_create', [], '/create/'],
+            ['follow_index', [], '/follow/'],
+            ['profile_follow', [USERNAME], f'/profile/{USERNAME}/follow/'],
+            ['profile_unfollow', [USERNAME],  f'/profile/{USERNAME}/unfollow/'],
         ]
-        for urlname, url in cases:
-            with self.subTest(urlname=urlname):
-                self.assertEqual(urlname, url)
+        for url1, args, url2 in cases:
+            with self.subTest(url=url1, args=args):
+                self.assertEqual(reverse('posts:' + url1, args= args), url2)
