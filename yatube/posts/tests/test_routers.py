@@ -9,16 +9,12 @@ USERNAME = 'Joshua'
 
 
 class PostsRoutersTests(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.user = User.objects.create_user(username=USERNAME)
-        cls.post = Post.objects.create(
-            author=cls.user,
+    def test_routers_pages(self):
+        self.user = User.objects.create_user(username=USERNAME)
+        self.post = Post.objects.create(
+            author=self.user,
             text='text'
         )
-
-    def test_routers_pages(self):
         cases = [
             ['index', [], '/'],
             ['group_list', [SLUG], f'/group/{SLUG}/'],
