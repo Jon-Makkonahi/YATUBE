@@ -26,7 +26,7 @@ git clone git@github.com:Jon-Makkonahi/hw05_final.git
 ```
 
 ```
-cd api_yambd
+cd hw05_final
 ```
 
 Cоздать и активировать виртуальное окружение:
