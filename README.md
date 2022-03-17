@@ -14,8 +14,10 @@ YaTube - это социальную сеть для публикации лич
 - Daniil Bibikov (Jon-Makkonahi) https://github.com/Jon-Makkonahi
 
 ### Технологии:
-- Python
+- Python 
 - Django
+- PostreSQL
+- SQLite(на текущий момент в GitHub)
 
 ### Как запустить проект:
 
